@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import app.lawnchair.LawnchairLauncher
 import app.lawnchair.LawnchairLauncherQuickstep
+import app.lawnchair.nexuslauncher.OverlayCallbackImpl
 import com.android.launcher3.BuildConfig
 import com.android.launcher3.LauncherAppState
 import com.android.launcher3.Utilities
@@ -40,6 +41,14 @@ class PreferenceManager private constructor(context: Context) : BasePreferenceMa
             LawnchairLauncher.getLauncher(context).scheduleRestart()
         }
     }
+
+    private val reloadMinusOne = {
+        if (BuildConfig.FLAVOR_recents == "withQuickstep") {
+            LawnchairLauncherQuickstep.getLauncher(context).defaultOverlay!!.onMinusOneChanged()
+        } else {
+            LawnchairLauncher.getLauncher(context).defaultOverlay!!.onMinusOneChanged()
+        }
+    }
     private val reloadGrid = scheduleRestart
 
     val iconPackPackage = StringPref("pref_iconPackPackage", "", reloadIcons)
@@ -56,6 +65,7 @@ class PreferenceManager private constructor(context: Context) : BasePreferenceMa
     val allAppsIconSizeFactor = FloatPref("pref_allAppsIconSizeFactor", 1F, scheduleRestart)
     val allAppsTextSizeFactor = FloatPref("pref_allAppsTextSizeFactor", 1F, scheduleRestart)
     val allAppsColumns = IdpIntPref("pref_allAppsColumns", { numAllAppsColumns }, reloadGrid)
+    val minusOneEnable = BoolPref("pref_enableMinusOne", OverlayCallbackImpl.minusOneAvailable(context), reloadMinusOne)
 
     // TODO: Add the ability to manually delete empty pages.
     val allowEmptyPages = BoolPref("pref_allowEmptyPages", false)
